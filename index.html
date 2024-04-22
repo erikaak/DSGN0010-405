@@ -117,7 +117,35 @@
         function draw() {
           background(0);
           orbitControl();
-          displayObjects();
+        
+          // Update and draw objects and text
+          objects.forEach(obj => {
+            // Update position based on velocity
+            obj.x += obj.speed * obj.direction;
+            // Reset position if it goes beyond certain bounds
+            if ((obj.direction === 1 && obj.x > 200) || (obj.direction === -1 && obj.x < -200)) {
+              obj.direction *= -1;
+            }
+        
+            // Draw 3D object
+            push();
+            translate(obj.x, obj.y, obj.z);
+            fill(obj.color);
+            textFont(obj.font);
+            textSize(24); // Adjust text size if necessary
+            text(obj.text, 0, 0); // Draw text at object's location
+            box(20); // Drawing a simple box
+            pop();
+        
+            // Draw 2D object using graphics
+            graphics.fill(obj.color);
+            graphics.textFont(obj.font);
+            graphics.text(obj.text, obj.x + width / 2, obj.y + height / 2, obj.z);
+          });
+        
+          // Draw the graphics buffer
+          image(graphics, -width / 2, -height / 2);
+        
           displayParticles();
         }
 
