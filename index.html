@@ -117,46 +117,9 @@
         function draw() {
           background(0);
           orbitControl();
-          
-          // Update and draw objects and text
-          objects.forEach(obj => {
-            push();
-            // Update position based on velocity
-            obj.x += obj.speed * obj.direction;
-            // Reset position if it goes beyond certain bounds
-            if ((obj.direction === 1 && obj.x > 200) || (obj.direction === -1 && obj.x < -200)) {
-              obj.direction *= -1;
-            }
-            translate(obj.x, obj.y, obj.z);
-            fill(obj.color);
-            textFont(obj.font);
-            textSize(24); // Adjust text size if necessary
-            text(obj.text, 0, 0); // Draw text at object's location
-            pop();
-          });
-        
-          // Draw 3D objects
-          graphics.clear();
-          objects.forEach(obj => {
-            obj.z += obj.speed * obj.direction;
-            if ((obj.direction === 1 && obj.z > 200) || (obj.direction === -1 && obj.z < -200)) {
-              obj.direction *= -1; // Change direction upon reaching a certain point
-            }
-            graphics.fill(obj.color);
-            graphics.textFont(obj.font);
-            graphics.text(obj.text, obj.x + width / 2, obj.y + height / 2, obj.z);
-          
-            push();
-            translate(obj.x, obj.y, obj.z);
-            fill(obj.color);
-            box(20); // Drawing a simple box
-            pop();
-          });
-          image(graphics, -width / 2, -height / 2);
-        
+          displayObjects();
           displayParticles();
         }
-
 
         function displayObjects() {
           objects.forEach(obj => {
@@ -232,66 +195,6 @@
               });
             }
           });
-        }
-
-        function resetView() {
-          let centerX = 0, centerY = 0, centerZ = 0;
-          let textCount = 0; // Variable to count the number of text objects
-
-          // Calculate the average position of text objects only
-          objects.forEach(obj => {
-            if (typeof obj.text !== 'undefined') { // Check if the object is a text object
-              centerX += obj.x;
-              centerY += obj.y;
-              centerZ += obj.z;
-              textCount++;
-            }
-          });
-
-          // If there are text objects, calculate the average position and focus the camera
-          if (textCount > 0) {
-            centerX /= textCount;
-            centerY /= textCount;
-            centerZ /= textCount;
-            camera(centerX, centerY, centerZ + 500, centerX, centerY, centerZ, 0, 1, 0);
-          } else {
-            camera(); // Reset camera to default position
-          }
-
-          // Remove data from Firebase if "xxx" is inputted
-          if (particles.length === 0 && objects.length === 0) {
-            database.ref('particles').remove();
-            database.ref('userInput').remove();
-          }
-        }
-
-        function mouseDragged() {
-          let newParticle = new Particle(pmouseX - width / 2, pmouseY - height / 2, mouseX - pmouseX, mouseY - pmouseY);
-          particles.push(newParticle);
-          database.ref('particles').push(newParticle.serialize());
-        }
-
-        function mousePressed() {
-          // Check if the mouse button pressed is the left mouse button
-          if (mouseButton === LEFT) {
-            // Randomly choose between changing color and exploding
-            let randomAction = random();
-            if (randomAction < 0.5) {
-              // Change color
-              let particleIndex = int(random(particles.length)); // Choose a random particle
-              particles[particleIndex].color = random(colorScheme); // Change its color to a random color
-            } else {
-              // Explode
-              let particleIndex = int(random(particles.length)); // Choose a random particle
-              particles[particleIndex].explode(); // Make it explode
-              particles.splice(particleIndex, 1); // Remove the original particle
-            }
-          }
-
-          // Clear particles if right-clicked
-          if (mouseButton === RIGHT) {
-            particles = [];
-          }
         }
     </script>
 </head>
